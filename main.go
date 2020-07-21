@@ -1,25 +1,23 @@
 package main
 
 import (
-	"fmt"
-	"log"
-
-	"github.com/buaazp/fasthttprouter"
-	"github.com/valyala/fasthttp"
+	"github.com/gofiber/fiber"
+	"kotakjualan-anggota/router"
 )
 
-func Index(ctx *fasthttp.RequestCtx, _ fasthttprouter.Params) {
-	fmt.Fprint(ctx, "Welcome!\n")
-}
+const port = 8000
 
-func Hello(ctx *fasthttp.RequestCtx, ps fasthttprouter.Params) {
-	fmt.Fprintf(ctx, "hello, %s!\n", ps.ByName("name"))
+var r router.Router
+
+func init() {
+	r = router.Router{}
 }
 
 func main() {
-	router := fasthttprouter.New()
-	router.GET("/", Index)
-	router.GET("/hello/:name", Hello)
+	app := fiber.New()
+	app.Get("v1/api/anggota/:id?", r.GetById)
+	app.Post("v1/api/anggota/create", r.CreateAnggota)
+	app.Put("v1/api/anggota/update/:id", r.UpdateAnggota)
 
-	log.Fatal(fasthttp.ListenAndServe(":8080", router.Handler))
+	app.Listen(port)
 }
